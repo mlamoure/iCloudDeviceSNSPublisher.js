@@ -54,8 +54,8 @@ function runiCloudNotification() {
 }
 
 function loadConfiguration(callback) {
-
-	fs.readFile("configuration.json", 'utf8', function (err, data) {
+	var filePath = path.join(__dirname + '/configuration.json');
+	fs.readFile(filePath, 'utf8', function (err, data) {
 		if (err) {
 			console.log("** (" + getCurrentTime() + ") ERROR LOADING CONFIGURATION: " + err);
 			return;
