@@ -8,6 +8,8 @@ var AWS = require('aws-sdk');
 var util = require('util');
 var moment = require('moment');
 var fs = require('fs');
+var path = require('path');
+
 var AWS_SNS;
 
 var dateformat = "YYYY/MM/DD HH:mm:ss";
