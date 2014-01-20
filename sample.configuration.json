@@ -1,0 +1,24 @@
+{
+	"_comment": "rename this file configuration.json once you are done editing it",
+
+	"AWS": {
+		"defaultRegion": "us-east-1",
+		"accessKeyId": "Access Key",
+		"secretAccessKey": "Secret Key"
+	},
+
+	"iCloudCheckFrequency": 1,
+
+	"AWSTopicARN": "arn:aws TOPIC GOES HERE",
+
+	"iCloudAccounts": [
+		{
+			"login": "login1",
+			"password": "password1"			
+		},
+		{
+			"login": "login2",
+			"password": "password2"			
+		}
+	]
+}
