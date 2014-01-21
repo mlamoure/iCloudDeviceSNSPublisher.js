@@ -12,33 +12,42 @@ var AmazonSNSPublisher = require("../Common/amazonSNSPublisher.js");
 var amazonSNSPublisher;
 
 var dateformat = "YYYY/MM/DD HH:mm:ss";
+var configFileIncPath = path.join(__dirname + '/configuration.json');
 
 var iCloudCheckFrequency;
 var iCloudAccounts;
 
-var configFileIncPath = path.join(__dirname + '/configuration.json');
+var iCloudCheckIntervalID;
 
 function main() {
 	loadConfiguration(function() {
 		
-		// run once right away.
-		runiCloudNotification();
-
-		// schedule reoccuring check
-		setInterval(function() {
-			runiCloudNotification();
-		}, iCloudCheckFrequency * 60 * 1000);
+		postConfigurationSettings();
 
 		// watch the configuration file for changes.  reload if anything changes
 		fs.watchFile(configFileIncPath, function (event, filename) {
 			console.log("** (" + getCurrentTime() + ") RELOADING CONFIGURATION");
 
 			loadConfiguration(function() {
-				// nothing to do here yet.
+				postConfigurationSettings();
 			});
 		});
-
 	});
+}
+
+function postConfigurationSettings() {
+	// run once right away.
+	runiCloudNotification();
+
+	if (typeof iCloudCheckIntervalID !== 'undefined')
+	{
+		clearInterval(iCloudCheckIntervalID)
+	}
+
+	// schedule reoccuring check
+	iCloudCheckIntervalID = setInterval(function() {
+		runiCloudNotification();
+	}, iCloudCheckFrequency * 60 * 1000);
 }
 
 function runiCloudNotification() {
