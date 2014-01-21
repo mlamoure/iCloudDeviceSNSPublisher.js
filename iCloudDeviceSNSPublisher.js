@@ -4,19 +4,19 @@
  */
 var Buffer = require('buffer').Buffer;
 var https  = require('https');
-var AWS = require('aws-sdk');
-var util = require('util');
 var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
 
-var AWS_SNS;
+var AmazonSNSPublisher = require("../Common/amazonSNSPublisher.js");
+var amazonSNSPublisher;
 
 var dateformat = "YYYY/MM/DD HH:mm:ss";
 
 var iCloudCheckFrequency;
-var iCloudTopicARN;
 var iCloudAccounts;
+
+var configFileIncPath = path.join(__dirname + '/configuration.json');
 
 function main() {
 	loadConfiguration(function() {
@@ -30,7 +30,7 @@ function main() {
 		}, iCloudCheckFrequency * 60 * 1000);
 
 		// watch the configuration file for changes.  reload if anything changes
-		fs.watchFile('devicewatch.conf', function (event, filename) {
+		fs.watchFile(configFileIncPath, function (event, filename) {
 			console.log("** (" + getCurrentTime() + ") RELOADING CONFIGURATION");
 
 			loadConfiguration(function() {
@@ -39,7 +39,6 @@ function main() {
 		});
 
 	});
-
 }
 
 function runiCloudNotification() {
@@ -50,14 +49,13 @@ function runiCloudNotification() {
 		getiCloudInfo(iCloudAccounts[iCloudAccount].login, iCloudAccounts[iCloudAccount].password, function(message) {
 			console.log("** (" + getCurrentTime() + ") About to publish message: " + message);
 
-			publish_sns(iCloudTopicARN, message)
+			amazonSNSPublisher.publish(message);
 		});
 	}	
 }
 
 function loadConfiguration(callback) {
-	var filePath = path.join(__dirname + '/configuration.json');
-	fs.readFile(filePath, 'utf8', function (err, data) {
+	fs.readFile(configFileIncPath, 'utf8', function (err, data) {
 		if (err) {
 			console.log("** (" + getCurrentTime() + ") ERROR LOADING CONFIGURATION: " + err);
 			return;
@@ -67,12 +65,6 @@ function loadConfiguration(callback) {
 
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Adding AWS credentials");
 
-		// configure AWS 
-		AWS.config.update({
-			'region': configuration.AWS.defaultRegion,
-		    'accessKeyId': configuration.AWS.accessKeyId,
-		    'secretAccessKey': configuration.AWS.secretAccessKey
-		});
 
 		iCloudAccounts = configuration.iCloudAccounts;
 
@@ -85,10 +77,8 @@ function loadConfiguration(callback) {
 		iCloudCheckFrequency = parseInt(configuration.iCloudCheckFrequency);
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Refresh Frequency: " + iCloudCheckFrequency);
 
-		iCloudTopicARN = configuration.AWSTopicARN;
-		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting SNS Topic to publish on: " + iCloudTopicARN);
-
-		AWS_SNS = new AWS.SNS().client;		
+		amazonSNSPublisher = new AmazonSNSPublisher(configuration.AWSTopicARN);
+		amazonSNSPublisher.configureAWSCredentials(configuration.AWS.defaultRegion, configuration.AWS.accessKeyId, configuration.AWS.secretAccessKey);
 
 		if (callback != null) callback();
 	});
@@ -143,22 +133,6 @@ function postRequest(host, username, password, callback) {
     });
     apiRequest.end();
 };
-
-function publish_sns(topicARN, message) {
-	AWS_SNS.publish({
-	    'TopicArn': topicARN,
-	    'Message': message,
-	}, function (err, result) {
-	 
-	    if (err !== null) {
-			console.log("** (" + getCurrentTime() + ") ERROR: ");
-	        console.log(util.inspect(err));
-			return;
-	    }
-			console.log("** (" + getCurrentTime() + ") Sent a message and Amazon responded with: ");
-			console.log(result);
-	});
-}
 
 function getCurrentTime() {
 	return (moment().format(dateformat));
