@@ -41,7 +41,7 @@ function postConfigurationSettings() {
 
 	if (typeof iCloudCheckIntervalID !== 'undefined')
 	{
-		clearInterval(iCloudCheckIntervalID)
+		clearInterval(iCloudCheckIntervalID);
 	}
 
 	// schedule reoccuring check
@@ -93,13 +93,18 @@ function loadConfiguration(callback) {
 	});
 }
 
-function buildiCloudSNSMessage(id, name, modelDisplayName, batteryLevel, batteryStatus) {
+function buildiCloudSNSMessage(id, name, modelDisplayName, batteryLevel, batteryStatus, timeStamp, lat, lon, isOld, isInaccurate) {
 	var message = {
 		'deviceID': id,
 		'deviceName': name,
 		'modelDisplayName': modelDisplayName,
 		'batteryLevel': batteryLevel,
-		'batteryStatus': batteryStatus
+		'batteryStatus': batteryStatus,
+		'LocationTimestamp': timeStamp,
+		'latitude': lat,
+		'longitude': lon,
+		'isOldLocation': isOld,
+		'isInaccurateLocation': isInaccurate
 	}
 
 	return message;
