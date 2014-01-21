@@ -94,6 +94,12 @@ function loadConfiguration(callback) {
 }
 
 function buildiCloudSNSMessage(id, name, modelDisplayName, batteryLevel, batteryStatus, timeStamp, lat, lon, isOld, isInaccurate) {
+	timeStamp = timeStamp || "unknown";
+	lat = lat || "unknown";
+	lon = lon || "unknown";
+	isOld = isOld || "unknown";
+	isInaccurate = isInaccurate || "unknown";
+
 	var message = {
 		'deviceID': id,
 		'deviceName': name,
