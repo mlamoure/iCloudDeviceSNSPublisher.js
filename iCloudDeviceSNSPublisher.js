@@ -46,6 +46,8 @@ function postConfigurationSettings() {
 
 	// schedule reoccuring check
 	iCloudCheckIntervalID = setInterval(function() {
+		console.log("** (" + getCurrentTime() + ") About to run a scheduled notification update for all iOS devices...");
+
 		runiCloudNotification();
 	}, iCloudCheckFrequency * 60 * 1000);
 }
