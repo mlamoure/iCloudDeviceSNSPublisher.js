@@ -8,7 +8,7 @@ var moment = require('moment');
 var fs = require('fs');
 var path = require('path');
 
-var AmazonSNSPublisher = require("../Common/amazonSNSPublisher.js");
+var AmazonSNSPublisher = require("./amazonSNSPublisher.js");
 var amazonSNSPublisher;
 
 var dateformat = "YYYY/MM/DD HH:mm:ss";
