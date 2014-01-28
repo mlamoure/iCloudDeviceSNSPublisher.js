@@ -96,10 +96,10 @@ function loadConfiguration(callback) {
 
 		for(var recordNum in configuration.iCloudAccounts) {
 			var newAccount = new iCloudAccount(configuration.iCloudAccounts[recordNum].login, configuration.iCloudAccounts[recordNum].password);
+			console.log("** (" + getCurrentTime() + ") CONFIGURATION: Adding iCloud Account " + newAccount.getLogin());
 
 			newAccount.setRefreshRates(iCloudDayCheckFrequency, iCloudNightCheckFrequency);
 
-			console.log("** (" + getCurrentTime() + ") CONFIGURATION: Adding iCloud Account " + newAccount.getLogin());
 			iCloudAccounts[iCloudAccounts.length] = newAccount;
 		}
 

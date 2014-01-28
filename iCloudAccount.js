@@ -141,9 +141,10 @@ function iCloudAccount(login, password) {
 	this._setInterval = function (refreshInterval, callback) {
 		this._clearInterval();
 
-		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes, multiplier of " + _multiplier + ", total of " + refreshInterval * _multiplier);
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes");
 
 		this._currentRefreshIntervalID = setInterval(function() {
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Scheduled check of iCloud devices about to begin...");
 			_self._getiCloudInfo(callback);
 		}, refreshInterval * _multiplier);
 	}
@@ -246,12 +247,12 @@ function iCloudAccount(login, password) {
 						theiCloudDevice.id = device.id;
 						theiCloudDevice.name = device.name;
 						theiCloudDevice.modelDisplayName = device.modelDisplayName;
-						console.log("** (" + _self._getCurrentTime() + ") New device discovered: " + theiCloudDevice.name);
-						console.log(theiCloudDevice.longitude);
+						console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - New iDevice discovered: " + theiCloudDevice.name);
 					}
 					else
 					{
 						theiCloudDevice = _self._devices[iCloudDeviceIndex];
+						console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - iDevice update being processed: " + theiCloudDevice.name);
 					}
 
 					theiCloudDevice.batteryLevel = device.batteryLevel;
@@ -274,10 +275,10 @@ function iCloudAccount(login, password) {
 
 						if (locationChanged)
 						{
-							console.log("** (" + _self._getCurrentTime() + ") The device changed locations, so going to announce the new location: " + device.location.longitude + ", " + device.location.latitude);							
+							console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - The device changed locations, so going to announce the new location: " + device.location.longitude + ", " + device.location.latitude);							
 						}
 						else {
-							console.log("** (" + _self._getCurrentTime() + ") The device " + device.name + " old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude + " new location: " + device.location.longitude + ", " + device.location.latitude + ") did not move outside of the threshold amounts, so no update necessary.");							
+							console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - The device " + device.name + " old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude + " new location: " + device.location.longitude + ", " + device.location.latitude + ") did not move outside of the threshold amounts, so no update necessary.");							
 						}
 	
 						theiCloudDevice.latitude = device.location.latitude;
