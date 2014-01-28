@@ -60,6 +60,13 @@ function postConfigurationSettings() {
 }
 
 function resetConfiguration() {
+	for (var recordNum in iCloudAccounts)
+	{
+		console.log("** (" + getCurrentTime() + ") About to clear processing for iCloud account " + iCloudAccounts[recordNum].getLogin());
+
+		iCloudAccounts[recordNum].clearAccount();
+	}	
+
 	iCloudAccounts = undefined;
 	iCloudDayCheckFrequency = undefined;
 	iCloudNightCheckFrequency = undefined;

@@ -33,6 +33,11 @@ function iCloudAccount(login, password) {
 		this._nightRefreshRate = night;
 	}
 
+	this.clearAccount = function () {
+		this._clearInterval();
+		this._clearScheduleChange();
+	}
+
 	this.processiCloudDevices = function (smartUpdate, callback) {
 		this._smartUpdate = smartUpdate;
 
@@ -104,12 +109,7 @@ function iCloudAccount(login, password) {
 
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Scheduling a job to change the refresh at " + scheduleDateTime);			
 
-		if (typeof _scheduledJobID !== 'undefined')
-		{
-			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - ODD: Clearing a previous scheduled job to change the refresh interval.");			
-			_scheduledJobID.cancel();
-			_scheduledJobID = undefined;
-		}
+		this._clearScheduleChange();
 
 		// Schedule a change to the interval
 		this._scheduledJobID = _schedule.scheduleJob(scheduleDateTime, function() {
@@ -120,13 +120,26 @@ function iCloudAccount(login, password) {
 		});		
 	}
 
-	this._setInterval = function (refreshInterval, callback) {
+	this._clearScheduleChange = function() {
+		if (typeof _scheduledJobID !== 'undefined')
+		{
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - ODD: Clearing a previous scheduled job to change the refresh interval.");			
+			_scheduledJobID.cancel();
+			_scheduledJobID = undefined;
+		}
+	}
+
+	this._clearInterval = function() {
 		if (typeof _currentRefreshIntervalID !== 'undefined')
 		{
 			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Clearing a previous refresh Interval");
 			clearInterval(_currentRefreshIntervalID);
 			_currentRefreshIntervalID = undefined;
-		}
+		}		
+	}
+
+	this._setInterval = function (refreshInterval, callback) {
+		this._clearInterval();
 
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes, multiplier of " + _multiplier + ", total of " + refreshInterval * _multiplier);
 
