@@ -17,6 +17,7 @@ var iCloudDayCheckFrequency;
 var iCloudNightCheckFrequency;
 var smartUpdatesOnly;
 var iCloudAccounts;
+var fakePublish;
 
 var iCloudCheckIntervalID;
 
@@ -54,7 +55,13 @@ function postConfigurationSettings() {
 
 			console.log("** (" + getCurrentTime() + ") About to publish message for iDevice: " + iDevice.name + ", Message: " + JSON.stringify(message));
 
-			amazonSNSPublisher.publish(JSON.stringify(message));
+			if (!fakePublish) {
+				amazonSNSPublisher.publish(JSON.stringify(message));
+			}
+			else
+			{
+				console.log("** (" + getCurrentTime() + ") Did NOT publish because the fakePublish flag is set");
+			}
 		});
 	}	
 }
@@ -72,6 +79,7 @@ function resetConfiguration() {
 	iCloudNightCheckFrequency = undefined;
 	smartUpdatesOnly = undefined;
 	amazonSNSPublisher = undefined;
+	fakePublish = undefined;
 }
 
 function loadConfiguration(callback) {
@@ -88,6 +96,7 @@ function loadConfiguration(callback) {
 		iCloudDayCheckFrequency = parseInt(configuration.iCloudDayCheckFrequency);
 		iCloudNightCheckFrequency = parseInt(configuration.iCloudNightCheckFrequency);
 		smartUpdatesOnly = configuration.SmartUpdatesOnly;
+		fakePublish = configuration.FakePublish;
 
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Daytime Refresh Frequency: " + iCloudDayCheckFrequency);
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Nighttime Refresh Frequency: " + iCloudNightCheckFrequency);

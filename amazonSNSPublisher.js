@@ -30,8 +30,8 @@ function AmazonSNSPublisher(topic) {
 				console.log(_util.inspect(err));
 				return;
 		    }
-				console.log("** (" + _self._getCurrentTime() + ") Sent a message and Amazon responded with: ");
-				console.log(result);
+				console.log("** (" + _self._getCurrentTime() + ") Amazon message publish was sucessful");
+//				console.log(result);
 		});
 	}
 

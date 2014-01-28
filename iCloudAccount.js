@@ -4,7 +4,7 @@ var iCloudDevice = require("./iCloudDevice.js");
 function iCloudAccount(login, password) {
 	var _login = login;
 	var _password = password;
-	var _devices;
+	var _devices = new Array();
 	var _dayRefreshRate;
 	var _nightRefreshRate;
 	var _multiplier = 60 * 1000;
@@ -39,17 +39,17 @@ function iCloudAccount(login, password) {
 	}
 
 	this.processiCloudDevices = function (smartUpdate, callback) {
-		this._smartUpdate = smartUpdate;
+		_smartUpdate = smartUpdate;
 
-		// check iCloud once right away
+		// uncomment to check iCloud once right away
 //		this._getiCloudInfo(callback);
 
-		var sleepAmount = parseInt((Math.random() * 10) + 1);
+		var sleepAmount = parseInt((Math.random() * this._getCurrentRefreshInterval()) + 1);
 
 		var sleepTime = _moment();
 		sleepTime.add('minutes', sleepAmount);
 
-		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - going to wait for " + sleepAmount + " minute(s) before starting to schedule iCloud updates, scheduled for " + sleepTime.format(_dateformat));			
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - FIRST RUN ONLY, Going to wait for " + sleepAmount + " (RANDOMIZED) minute(s) before starting to schedule iCloud updates, scheduled for " + sleepTime.format(_dateformat));			
 
 		// one time job, so don't bother saving the ID.
 		_schedule.scheduleJob(sleepTime, function() {
@@ -63,13 +63,13 @@ function iCloudAccount(login, password) {
 
 		if (_moment().hour() > _dayRefreshStartTime || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
 		{
-			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
+//			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
 
 			refreshInterval = this._dayRefreshRate;
 		}
 		else
 		{
-			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
+//			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
 		}
 
 //		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Going to refresh at " + refreshInterval + " minute intervals");
@@ -112,7 +112,7 @@ function iCloudAccount(login, password) {
 		this._clearScheduleChange();
 
 		// Schedule a change to the interval
-		this._scheduledJobID = _schedule.scheduleJob(scheduleDateTime, function() {
+		_scheduledJobID = _schedule.scheduleJob(scheduleDateTime, function() {
 			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled job to change the interval is running...");
 			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
 			_scheduledJobID = undefined;
@@ -141,10 +141,12 @@ function iCloudAccount(login, password) {
 	this._setInterval = function (refreshInterval, callback) {
 		this._clearInterval();
 
-		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes");
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes, next refresh time will be: " + _moment().add('minutes', refreshInterval).format(_dateformat));
 
-		this._currentRefreshIntervalID = setInterval(function() {
-			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled check of iCloud devices about to begin...  Number of iDevices for this Account: " + _devices.length);
+		_currentRefreshIntervalID = setInterval(function() {
+			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled check of iCloud devices about to begin...  ")
+			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Number of iDevices for this Account: " + _devices.length);
+			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Next refresh time will be: " + _moment().add('minutes', _self._getCurrentRefreshInterval()).format(_dateformat));
 			_self._getiCloudInfo(callback);
 		}, refreshInterval * _multiplier);
 	}
@@ -224,11 +226,6 @@ function iCloudAccount(login, password) {
 				console.log("** (" + getCurrentTime() + ") ERROR: " + err);
 			}
 
-			if (typeof _devices === 'undefined')
-			{
-				_devices = new Array();
-			}
-
 			var theiCloudDevice;
 			var locationChanged = false;
 
@@ -247,12 +244,12 @@ function iCloudAccount(login, password) {
 						theiCloudDevice.id = device.id;
 						theiCloudDevice.name = device.name;
 						theiCloudDevice.modelDisplayName = device.modelDisplayName;
-						console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - New iDevice discovered: " + theiCloudDevice.name);
+						console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - New iDevice discovered: " + theiCloudDevice.name);
 					}
 					else
 					{
-						theiCloudDevice = _self._devices[iCloudDeviceIndex];
-						console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - iDevice update being processed: " + theiCloudDevice.name);
+						theiCloudDevice = _devices[iCloudDeviceIndex];
+						console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - iDevice update being processed: " + theiCloudDevice.name);
 					}
 
 					theiCloudDevice.batteryLevel = device.batteryLevel;
@@ -260,7 +257,7 @@ function iCloudAccount(login, password) {
 
 					if (device.location !== null)
 					{
-						locationChanged = false;
+						locationChanged = !_smartUpdate;
 
 						// if the new latitute and longitude are within +/- X of the previous values, don't do anything
 						if (device.location.longitude > theiCloudDevice.longitude + _threshold || device.location.longitude < theiCloudDevice.longitude - _threshold)
@@ -275,10 +272,14 @@ function iCloudAccount(login, password) {
 
 						if (locationChanged)
 						{
-							console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - The device " + device.name + " CHANGED old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude + " new location: " + device.location.longitude + ", " + device.location.latitude + ")");							
+							console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - The device " + device.name + " LOCATION CHANGED");
+							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - Old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude);
+							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - New location: " + device.location.longitude + ", " + device.location.latitude);							
 						}
 						else {
-							console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - The device " + device.name + " DID NOT CHANGE old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude + " new location: " + device.location.longitude + ", " + device.location.latitude + ")");							
+							console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - The device " + device.name + " LOCATION DID NOT CHANGE");
+							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - Old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude);
+							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - New location: " + device.location.longitude + ", " + device.location.latitude);							
 						}
 	
 						theiCloudDevice.latitude = device.location.latitude;

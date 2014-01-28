@@ -10,6 +10,7 @@
 	"iCloudDayCheckFrequency": 30,
 	"iCloudNightCheckFrequency": 60,
 	"SmartUpdatesOnly": true,
+	"FakePublish": false,
 
 	"AWSTopicARN": "arn:aws TOPIC GOES HERE",
 
