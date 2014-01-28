@@ -10,9 +10,11 @@ function iCloudAccount(login, password) {
 	var _multiplier = 60 * 1000;
 	var _self = this;
 	var _smartUpdate;
-	var _currentRefreshIntervalID;
+	var _currentRefreshIntervalID = undefined;
 	var _threshold = .0009;
-	var _scheduledJobID;
+	var _dayRefreshStartTime = 7;  // hour
+	var _dayRefreshEndTime = 22;   // hour
+	var _scheduledJobID = undefined;
 	var _dateformat = "YYYY/MM/DD HH:mm:ss";
 	var _moment = require('moment');
 	var _buffer = require('buffer').Buffer;
@@ -24,55 +26,113 @@ function iCloudAccount(login, password) {
 	}
 
 	this.setRefreshRates = function(day, night) {
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Daytime refresh frequency being set to " + day);			
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Nighttime refresh frequency being set to " + night);			
+
 		this._dayRefreshRate = day;
 		this._nightRefreshRate = night;
 	}
 
 	this.processiCloudDevices = function (smartUpdate, callback) {
-		var refreshInterval = _nightRefreshRate; // only between the hours of midnight and 6am
-		var scheduledJobTime = _moment();
-
 		this._smartUpdate = smartUpdate;
+
+		// check iCloud once right away
 		this._getiCloudInfo(callback);
 
-		if (_moment().hour() >= 6 && _moment().minutes() >= 1)
+		var sleepAmount = parseInt((Math.random() * 10) + 1);
+
+		var sleepTime = _moment();
+		sleepTime.add('minutes', sleepAmount);
+
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - going to wait for " + sleepAmount + " minute(s) before starting to schedule iCloud updates, scheduled for " + sleepTime.format(_dateformat));			
+
+		// one time job, so don't bother saving the ID.
+		_schedule.scheduleJob(sleepTime, function() {
+			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
+			_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+		});		
+	}
+
+	this._getCurrentRefreshInterval = function () {
+		var refreshInterval = this._nightRefreshRate; // only between the hours of midnight and 6am
+
+		if (_moment().hour() > _dayRefreshStartTime || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
 		{
-			console.log("** (" + this._getCurrentTime() + ") It's currently between the hours of 6am and midnight, so daytime refresh will take place (every " + this._dayRefreshRate + " minutes)");
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
 
 			refreshInterval = this._dayRefreshRate;
-			scheduledJobTime.add('days', 1);
-			scheduledJobTime.hour(0);
-			scheduledJobTime.minutes(0);
-			scheduledJobTime.seconds(0);
 		}
 		else
 		{
-			console.log("** (" + this._getCurrentTime() + ") It's currently between the hours of midnight and 6am, so daytime refresh will take place (every " + refreshInterval + " minutes)");			
-			scheduledJobTime.hour(6);
-			scheduledJobTime.minutes(1);
-			scheduledJobTime.seconds(0);
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
 		}
 
-		if (typeof this._currentRefreshIntervalID !== 'undefined')
+//		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Going to refresh at " + refreshInterval + " minute intervals");
+
+		return (refreshInterval);
+	}
+
+	this._getIntervalChangeTime = function () {
+		var scheduledJobTime = _moment();
+
+		// if it's daytime
+		if (_moment().hour() > _dayRefreshStartTime || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
 		{
-			clearInterval(this._currentRefreshIntervalID)
+			scheduledJobTime.hour(_dayRefreshEndTime);
+		}
+		else
+		{
+			scheduledJobTime.add('days', 1);
+			scheduledJobTime.hour(_dayRefreshStartTime);
 		}
 
-		this._currentRefreshIntervalID = setInterval(function() {
-			_self._getiCloudInfo(callback);
-		}, refreshInterval * _multiplier);			
+		scheduledJobTime.minutes(1);
+		scheduledJobTime.seconds(0);
 
-		console.log("** (" + this._getCurrentTime() + ") Scheduling a job to change the refresh at " + scheduledJobTime.format(_dateformat));			
+		return (scheduledJobTime);
+	}
+
+	this._scheduleIntervalChange = function (time, callback) {
+		var scheduleDateTime = new Date(
+			_moment(time, _dateformat).year(), 
+			_moment(time, _dateformat).month(), 
+			_moment(time, _dateformat).date(), 
+			_moment(time, _dateformat).hour(), 
+			_moment(time, _dateformat).minute(), 
+			_moment(time, _dateformat).seconds()
+		);
+
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Scheduling a job to change the refresh at " + scheduleDateTime);			
 
 		if (typeof this._scheduledJobID !== 'undefined')
 		{
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - ODD: Clearing a previous scheduled job to change the refresh interval.");			
 			this._scheduledJobID.cancel();
+			this._scheduledJobID = undefined;
 		}
 
-		// Schedule a refresh for when it's day and night.
-		this._scheduledJobID = _schedule.scheduleJob(scheduledJobTime, function() {
-			_self.processiCloudDevices(smartUpdate, callback);
-		});
+		// Schedule a change to the interval
+		this._scheduledJobID = _schedule.scheduleJob(scheduleDateTime, function() {
+			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled job to change the interval is running...");
+			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
+			_self._scheduledJobID = undefined;
+			_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+		});		
+	}
+
+	this._setInterval = function (refreshInterval, callback) {
+		if (typeof this._currentRefreshIntervalID !== 'undefined')
+		{
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Clearing a previous refresh Interval");
+			clearInterval(this._currentRefreshIntervalID);
+			this._currentRefreshIntervalID = undefined;
+		}
+
+		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes, multiplier of " + _multiplier + ", total of " + refreshInterval * _multiplier);
+
+		this._currentRefreshIntervalID = setInterval(function() {
+			_self._getiCloudInfo(callback);
+		}, refreshInterval * _multiplier);
 	}
 
 	this._getCurrentTime = function () {
@@ -141,6 +201,7 @@ function iCloudAccount(login, password) {
 	}
 
 	this._getiCloudInfo = function(callback) {
+//		return;
 		var message = "";
 
 		// Find all devices the user owns

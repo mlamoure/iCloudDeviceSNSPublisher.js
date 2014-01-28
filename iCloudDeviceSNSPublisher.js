@@ -54,7 +54,7 @@ function postConfigurationSettings() {
 
 			console.log("** (" + getCurrentTime() + ") About to publish message for iDevice: " + iDevice.name + ", Message: " + JSON.stringify(message));
 
-			amazonSNSPublisher.publish(message);
+			amazonSNSPublisher.publish(JSON.stringify(message));
 		});
 	}	
 }

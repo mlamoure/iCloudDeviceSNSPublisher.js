@@ -27,7 +27,7 @@ function AmazonSNSPublisher(topic) {
 		 
 		    if (err !== null) {
 				console.log("** (" + _self._getCurrentTime() + ") SNS ERROR: ");
-				console.log(_self._util.inspect(err));
+				console.log(_util.inspect(err));
 				return;
 		    }
 				console.log("** (" + _self._getCurrentTime() + ") Sent a message and Amazon responded with: ");
