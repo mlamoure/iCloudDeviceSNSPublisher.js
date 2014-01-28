@@ -104,28 +104,28 @@ function iCloudAccount(login, password) {
 
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Scheduling a job to change the refresh at " + scheduleDateTime);			
 
-		if (typeof this._scheduledJobID !== 'undefined')
+		if (typeof _scheduledJobID !== 'undefined')
 		{
 			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - ODD: Clearing a previous scheduled job to change the refresh interval.");			
-			this._scheduledJobID.cancel();
-			this._scheduledJobID = undefined;
+			_scheduledJobID.cancel();
+			_scheduledJobID = undefined;
 		}
 
 		// Schedule a change to the interval
 		this._scheduledJobID = _schedule.scheduleJob(scheduleDateTime, function() {
 			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled job to change the interval is running...");
 			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
-			_self._scheduledJobID = undefined;
+			_scheduledJobID = undefined;
 			_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
 		});		
 	}
 
 	this._setInterval = function (refreshInterval, callback) {
-		if (typeof this._currentRefreshIntervalID !== 'undefined')
+		if (typeof _currentRefreshIntervalID !== 'undefined')
 		{
 			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Clearing a previous refresh Interval");
 			clearInterval(this._currentRefreshIntervalID);
-			this._currentRefreshIntervalID = undefined;
+			_currentRefreshIntervalID = undefined;
 		}
 
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes, multiplier of " + _multiplier + ", total of " + refreshInterval * _multiplier);
