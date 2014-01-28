@@ -124,7 +124,7 @@ function iCloudAccount(login, password) {
 		if (typeof _currentRefreshIntervalID !== 'undefined')
 		{
 			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Clearing a previous refresh Interval");
-			clearInterval(this._currentRefreshIntervalID);
+			clearInterval(_currentRefreshIntervalID);
 			_currentRefreshIntervalID = undefined;
 		}
 
