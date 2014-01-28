@@ -37,7 +37,7 @@ function iCloudAccount(login, password) {
 		this._smartUpdate = smartUpdate;
 
 		// check iCloud once right away
-		this._getiCloudInfo(callback);
+//		this._getiCloudInfo(callback);
 
 		var sleepAmount = parseInt((Math.random() * 10) + 1);
 
