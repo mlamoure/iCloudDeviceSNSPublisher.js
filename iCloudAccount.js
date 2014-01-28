@@ -246,19 +246,25 @@ function iCloudAccount(login, password) {
 
 					if (device.location !== null)
 					{
+						locationChanged = false;
+
 						// if the new latitute and longitude are within +/- X of the previous values, don't do anything
+						if (device.location.longitude > theiCloudDevice.longitude + _threshold || device.location.longitude < theiCloudDevice.longitude - _threshold)
+						{
+							locationChanged = true;
+						}
+
 						if (device.location.latitude > theiCloudDevice.latitude + _threshold || device.location.latitude < theiCloudDevice.latitude - _threshold)
 						{
-							if (device.location.longitude > theiCloudDevice.longitude + _threshold || device.location.longitude < theiCloudDevice.longitude - _threshold)
-							{
-								locationChanged = true;
-							}
-							else {
-								console.log("** (" + _self._getCurrentTime() + ") The device " + device.name + " location " + device.location.longitude + ", " + device.location.latitude + ") was not within the threshold, so no update necessary.");
-							}
+							locationChanged = true;
+						}
+
+						if (locationChanged)
+						{
+							console.log("** (" + _self._getCurrentTime() + ") The device changed locations, so going to announce the new location: " + device.location.longitude + ", " + device.location.latitude);							
 						}
 						else {
-							console.log("** (" + _self._getCurrentTime() + ") The device " + device.name + " location " + device.location.longitude + ", " + device.location.latitude + ") was not within the threshold, so no update necessary.");
+							console.log("** (" + _self._getCurrentTime() + ") The device " + device.name + " old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude + " new location: " + device.location.longitude + ", " + device.location.latitude + ") did not move outside of the threshold amounts, so no update necessary.");							
 						}
 	
 						theiCloudDevice.latitude = device.location.latitude;
