@@ -144,7 +144,7 @@ function iCloudAccount(login, password) {
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Refresh will be scheduled to take place every " + refreshInterval + " minutes");
 
 		this._currentRefreshIntervalID = setInterval(function() {
-			console.log("** (" + _self._getCurrentTime() + ") " + this.getLogin() + " Account - Scheduled check of iCloud devices about to begin...  Number of iDevices for this Account: " + _devices.length);
+			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled check of iCloud devices about to begin...  Number of iDevices for this Account: " + _devices.length);
 			_self._getiCloudInfo(callback);
 		}, refreshInterval * _multiplier);
 	}
