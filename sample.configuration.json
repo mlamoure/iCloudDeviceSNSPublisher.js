@@ -7,7 +7,9 @@
 		"secretAccessKey": "Secret Key"
 	},
 
-	"iCloudCheckFrequency": 1,
+	"iCloudDayCheckFrequency": 30,
+	"iCloudNightCheckFrequency": 60,
+	"SmartUpdatesOnly": true,
 
 	"AWSTopicARN": "arn:aws TOPIC GOES HERE",
 
