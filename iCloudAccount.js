@@ -1,6 +1,5 @@
 var iCloudDevice = require("./iCloudDevice.js");
 
-
 function iCloudAccount(login, password) {
 	var _login = login;
 	var _password = password;
@@ -145,7 +144,9 @@ function iCloudAccount(login, password) {
 
 		_currentRefreshIntervalID = setInterval(function() {
 			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled check of iCloud devices about to begin...  ")
-			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Number of iDevices for this Account: " + _devices.length);
+			if (typeof _devices !== 'undefined') {
+				console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Number of iDevices for this Account: " + _devices.length);
+			}
 			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Next refresh time will be: " + _moment().add('minutes', _self._getCurrentRefreshInterval()).format(_dateformat));
 			_self._getiCloudInfo(callback);
 		}, refreshInterval * _multiplier);
