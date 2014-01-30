@@ -62,13 +62,13 @@ function iCloudAccount(login, password) {
 
 		if (_moment().hour() > _dayRefreshStartTime || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
 		{
-//			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
 
 			refreshInterval = this._dayRefreshRate;
 		}
 		else
 		{
-//			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
 		}
 
 //		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Going to refresh at " + refreshInterval + " minute intervals");
@@ -115,7 +115,10 @@ function iCloudAccount(login, password) {
 			console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - Scheduled job to change the interval is running...");
 			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
 			_scheduledJobID = undefined;
-			_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+
+			_schedule.scheduleJob(_moment().add('hours', 1), function() {
+				_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+			});
 		});		
 	}
 
