@@ -24,12 +24,13 @@ function iCloudAccount(login, password) {
 		return _login;
 	}
 
-	this.setRefreshRates = function(day, night) {
+	this.setRefreshRates = function(day, night, geoChangeThreshold) {
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Daytime refresh frequency being set to " + day);			
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Nighttime refresh frequency being set to " + night);			
 
 		this._dayRefreshRate = day;
 		this._nightRefreshRate = night;
+		this._threshold = geoChangeThreshold;
 	}
 
 	this.clearAccount = function () {
@@ -278,7 +279,7 @@ function iCloudAccount(login, password) {
 						{
 							console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - The device " + device.name + " LOCATION CHANGED");
 							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - Old location: " + theiCloudDevice.longitude + ", " + theiCloudDevice.latitude);
-							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - New location: " + device.location.longitude + ", " + device.location.latitude);							
+							console.log("** (" + _self._getCurrentTime() + ") " + device.name + " - New location: " + device.location.longitude + ", " + device.location.latitude);
 						}
 						else {
 							console.log("** (" + _self._getCurrentTime() + ") " + _self.getLogin() + " Account - The device " + device.name + " LOCATION DID NOT CHANGE");
@@ -288,12 +289,13 @@ function iCloudAccount(login, password) {
 	
 						theiCloudDevice.latitude = device.location.latitude;
 						theiCloudDevice.longitude = device.location.longitude;
-						theiCloudDevice.timeStamp = device.location.timeStamp;						
+						theiCloudDevice.timeStamp = device.location.timeStamp;
+						theiCloudDevice.locationChanged = locationChanged;					
 					}
 
 					_devices[iCloudDeviceIndex] = theiCloudDevice;
 
-					if (locationChanged) {
+					if (locationChanged || !this._smartUpdate) {
 						callback(theiCloudDevice);
 					}
 				}

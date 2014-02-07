@@ -97,6 +97,7 @@ function loadConfiguration(callback) {
 		iCloudNightCheckFrequency = parseInt(configuration.iCloudNightCheckFrequency);
 		smartUpdatesOnly = configuration.SmartUpdatesOnly;
 		fakePublish = configuration.FakePublish;
+		geoChangeThreshold = configuration.SmartUpdateLatLonThreshold;
 
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Daytime Refresh Frequency: " + iCloudDayCheckFrequency);
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Nighttime Refresh Frequency: " + iCloudNightCheckFrequency);
@@ -107,7 +108,7 @@ function loadConfiguration(callback) {
 			var newAccount = new iCloudAccount(configuration.iCloudAccounts[recordNum].login, configuration.iCloudAccounts[recordNum].password);
 			console.log("** (" + getCurrentTime() + ") CONFIGURATION: Adding iCloud Account " + newAccount.getLogin());
 
-			newAccount.setRefreshRates(iCloudDayCheckFrequency, iCloudNightCheckFrequency);
+			newAccount.setRefreshRates(iCloudDayCheckFrequency, iCloudNightCheckFrequency, geoChangeThreshold);
 
 			iCloudAccounts[iCloudAccounts.length] = newAccount;
 		}
