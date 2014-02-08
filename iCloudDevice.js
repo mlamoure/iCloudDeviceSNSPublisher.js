@@ -9,6 +9,7 @@ function iCloudDevice() {
 	this.isOld;
 	this.isInAccurate;
 	this.timeStamp;
+	this.locationChanged;
 }
 
 module.exports = iCloudDevice;

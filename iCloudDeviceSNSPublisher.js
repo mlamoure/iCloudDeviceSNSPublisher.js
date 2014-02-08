@@ -131,7 +131,8 @@ function buildiCloudSNSMessage(iDevice) {
 		'latitude': iDevice.latitude,
 		'longitude': iDevice.longitude,
 		'isOldLocation': iDevice.isOld,
-		'isInaccurateLocation': iDevice.isInaccurate
+		'isInaccurateLocation': iDevice.isInaccurate,
+		'locationChanged': iDevice.locationChanged
 	}
 
 	return message;
