@@ -16,7 +16,7 @@ function AmazonSNSPublisher(topic) {
 		    'secretAccessKey': secretAccessKey
 		});
 
-		_aws_sns = new _aws.SNS().client;
+		_aws_sns = new _aws.SNS({sslEnabled: true}).client;
 	}
 
 	this.publish = function(message) {
