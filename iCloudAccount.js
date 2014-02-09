@@ -42,7 +42,7 @@ function iCloudAccount(login, password) {
 		_smartUpdate = smartUpdate;
 
 		// uncomment to check iCloud once right away
-//		this._getiCloudInfo(callback);
+		this._getiCloudInfo(callback);
 
 		var sleepAmount = parseInt((Math.random() * this._getCurrentRefreshInterval()) + 1);
 
@@ -262,7 +262,7 @@ function iCloudAccount(login, password) {
 
 					if (device.location !== null)
 					{
-						locationChanged = !_smartUpdate;
+//						locationChanged = !_smartUpdate;
 
 						// if the new latitute and longitude are within +/- X of the previous values, don't do anything
 						if (device.location.longitude > theiCloudDevice.longitude + _threshold || device.location.longitude < theiCloudDevice.longitude - _threshold)
@@ -295,7 +295,7 @@ function iCloudAccount(login, password) {
 
 					_devices[iCloudDeviceIndex] = theiCloudDevice;
 
-					if (locationChanged || !this._smartUpdate) {
+					if (locationChanged || !_smartUpdate) {
 						callback(theiCloudDevice);
 					}
 				}
