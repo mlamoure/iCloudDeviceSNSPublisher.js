@@ -38,11 +38,12 @@ function iCloudAccount(login, password) {
 		this._clearScheduleChange();
 	}
 
-	this.processiCloudDevices = function (smartUpdate, callback) {
+	this.processiCloudDevices = function (smartUpdate, processImmediately, callback) {
 		_smartUpdate = smartUpdate;
 
-		// uncomment to check iCloud once right away
-//		this._getiCloudInfo(callback);
+		if (processImmediately) {
+			this._getiCloudInfo(callback);
+		}
 
 		var sleepAmount = parseInt((Math.random() * this._getCurrentRefreshInterval()) + 1);
 

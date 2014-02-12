@@ -12,6 +12,7 @@
 	"SmartUpdatesOnly": true,
 	"SmartUpdateLatLonThreshold": 0.0009,
 	"FakePublish": false,
+	"ProcessImmediately": false,
 
 	"AWSTopicARN": "arn:aws TOPIC GOES HERE",
 

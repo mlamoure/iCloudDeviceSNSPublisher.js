@@ -18,6 +18,7 @@ var iCloudNightCheckFrequency;
 var smartUpdatesOnly;
 var iCloudAccounts;
 var fakePublish;
+var processImmediately;
 
 var iCloudCheckIntervalID;
 
@@ -46,7 +47,7 @@ function postConfigurationSettings() {
 	{
 		console.log("** (" + getCurrentTime() + ") About to initiate processing for iCloud account " + iCloudAccounts[recordNum].getLogin());
 
-		iCloudAccounts[recordNum].processiCloudDevices(smartUpdatesOnly, function(iDevice) {
+		iCloudAccounts[recordNum].processiCloudDevices(smartUpdatesOnly, processImmediately, function(iDevice) {
 			var message;
 
 			console.log("** (" + getCurrentTime() + ") Device " + iDevice.name + " has an update and is ready to be published...");
@@ -98,6 +99,7 @@ function loadConfiguration(callback) {
 		smartUpdatesOnly = configuration.SmartUpdatesOnly;
 		fakePublish = configuration.FakePublish;
 		geoChangeThreshold = configuration.SmartUpdateLatLonThreshold;
+		processImmediately = configuration.ProcessImmediately;
 
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Daytime Refresh Frequency: " + iCloudDayCheckFrequency);
 		console.log("** (" + getCurrentTime() + ") CONFIGURATION: Setting iCloud Nighttime Refresh Frequency: " + iCloudNightCheckFrequency);
