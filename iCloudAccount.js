@@ -42,7 +42,7 @@ function iCloudAccount(login, password) {
 		_smartUpdate = smartUpdate;
 
 		// uncomment to check iCloud once right away
-		this._getiCloudInfo(callback);
+//		this._getiCloudInfo(callback);
 
 		var sleepAmount = parseInt((Math.random() * this._getCurrentRefreshInterval()) + 1);
 
@@ -61,7 +61,7 @@ function iCloudAccount(login, password) {
 	this._getCurrentRefreshInterval = function () {
 		var refreshInterval = this._nightRefreshRate; // only between the hours of midnight and 6am
 
-		if (_moment().hour() > _dayRefreshStartTime || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
+		if ((_moment().hour() > _dayRefreshStartTime &&  _moment().hour() < _dayRefreshEndTime) || (_moment().hour() == _dayRefreshStartTime && _moment().minutes() >= 1))
 		{
 			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is daytime.  Daytime refresh rate will be used: " + this._dayRefreshRate);			
 
