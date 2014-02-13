@@ -70,7 +70,7 @@ function iCloudAccount(login, password) {
 		}
 		else
 		{
-			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + _nightRefreshRate);						
+			console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Determined that it is nighttime.  Nighttime refresh rate will be used: " + this._nightRefreshRate);
 		}
 
 //		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Going to refresh at " + refreshInterval + " minute intervals");
