@@ -37,6 +37,7 @@ function iCloudAccount(login, password) {
 	this.clearAccount = function () {
 		this._clearInterval();
 		this._clearScheduleChange();
+		_smartUpdate = undefined;
 
 		if (typeof _scheduleIntervalChangeJobID !== 'undefined') {
 			_scheduleIntervalChangeJobID.cancel();
