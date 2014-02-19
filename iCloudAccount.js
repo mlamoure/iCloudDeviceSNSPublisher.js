@@ -14,6 +14,7 @@ function iCloudAccount(login, password) {
 	var _dayRefreshStartTime = 7;  // hour
 	var _dayRefreshEndTime = 22;   // hour
 	var _scheduledJobID = undefined;
+	var _scheduleIntervalChangeJobID = undefined;
 	var _dateformat = "YYYY/MM/DD HH:mm:ss";
 	var _moment = require('moment');
 	var _buffer = require('buffer').Buffer;
@@ -53,9 +54,10 @@ function iCloudAccount(login, password) {
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - FIRST RUN ONLY, Going to wait for " + sleepAmount + " (RANDOMIZED) minute(s) before starting to schedule iCloud updates, scheduled for " + sleepTime.format(_dateformat));			
 
 		// one time job, so don't bother saving the ID.
-		_schedule.scheduleJob(sleepTime, function() {
+		_scheduleIntervalChangeJobID = _schedule.scheduleJob(sleepTime, function() {
 			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
 			_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+			_scheduleIntervalChangeJobID = undefined;
 		});		
 	}
 
@@ -118,8 +120,14 @@ function iCloudAccount(login, password) {
 			_self._setInterval(_self._getCurrentRefreshInterval(), callback);
 			_scheduledJobID = undefined;
 
-			_schedule.scheduleJob(_moment().add('hours', 1), function() {
+			if (typeof _scheduleIntervalChangeJobID !== 'undefined') {
+				_scheduleIntervalChangeJobID.cancel();
+				_scheduleIntervalChangeJobID = undefined;
+			}
+
+			_scheduleIntervalChangeJobID = _schedule.scheduleJob(_moment().add('hours', 1), function() {
 				_self._scheduleIntervalChange(_self._getIntervalChangeTime(), callback);
+				_scheduleIntervalChangeJobID = undefined;
 			});
 		});		
 	}
