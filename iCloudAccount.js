@@ -29,15 +29,18 @@ function iCloudAccount(login, password) {
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Daytime refresh frequency being set to " + day);			
 		console.log("** (" + this._getCurrentTime() + ") " + this.getLogin() + " Account - Nighttime refresh frequency being set to " + night);			
 
-		this._dayRefreshRate = day;
-		this._nightRefreshRate = night;
-		this._threshold = geoChangeThreshold;
+		_dayRefreshRate = day;
+		_nightRefreshRate = night;
+		_threshold = geoChangeThreshold;
 	}
 
 	this.clearAccount = function () {
 		this._clearInterval();
 		this._clearScheduleChange();
 		_smartUpdate = undefined;
+		_dayRefreshRate = undefined;
+		_nightRefreshRate = undefined;
+		_threshold = undefined;
 
 		if (typeof _scheduleIntervalChangeJobID !== 'undefined') {
 			_scheduleIntervalChangeJobID.cancel();
